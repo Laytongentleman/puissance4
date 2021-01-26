@@ -4,7 +4,7 @@
 #initialize
 
 def init(l, h):
-    """ prends la longueur et hauteur du tableau 
+    """ prends la longueur et hauteur du tableau
     et renvoie toujours un tableau à 2 dimensions rempli de 0"""
     #attention ne pas ecrire [ [0] * h] *l] car cela relie chaque colonne avec les autres
     g = [ [0] * h for i in range(l)]
@@ -27,7 +27,7 @@ def display(g):
         for j in range(len(g)):
             print(cg[j][i], end=" | ")
         print()
-    
+
 
 def coup_possible(g, c):
     """détermine si la grille g a de la place sur la colonne c"""
@@ -36,12 +36,18 @@ def coup_possible(g, c):
     else:
         return False
 
-# main script
+#Vérifie fin
+def fin (g):
+    for i in range (len(g)):
+        if coup_possible(g, i):
+            return True
+    return False
 
+# main script
 def main():
     """fait tourner le jeu"""
     j = True
-    while True:
+    while fin(g):
         display(g)
         c = int(input("colonne?"))
         j =  not j
@@ -53,7 +59,7 @@ def jouer(g,j,c):
     if coup_possible(g,c):
         for i in range(len(g[c])-1,-1, -1):
             if g[c][i] == 0:
-                g[c][i] = 1 if j else 2 
+                g[c][i] = 1 if j else 2
                 break
     else:
         print("c'est complet")
