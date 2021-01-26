@@ -1,8 +1,6 @@
 
 
-
-#initialize
-
+#initialise
 def init(l, h):
     """ prends la longueur et hauteur du tableau
     et renvoie toujours un tableau à 2 dimensions rempli de 0"""
@@ -13,10 +11,7 @@ def init(l, h):
 # Soit g notre grille de jeu
 g = init(7,6)
 
-print(g)
-
 # Intermediate Functions
-
 def display(g):
     """fonction d'affichage qui affiche dans le bon sens le tableau en plus de convertir les nb en symboles"""
     cg = init(7,6)
@@ -28,7 +23,7 @@ def display(g):
             print(cg[j][i], end=" | ")
         print()
 
-
+#Vérifie si colonne libre
 def coup_possible(g, c):
     """détermine si la grille g a de la place sur la colonne c"""
     if g[c][0] == 0:
@@ -36,7 +31,7 @@ def coup_possible(g, c):
     else:
         return False
 
-#Vérifie fin
+#Vérifie si complet
 def fin (g):
     for i in range (len(g)):
         if coup_possible(g, i):
@@ -52,10 +47,12 @@ def main():
         c = int(input("colonne?"))
         j =  not j
         jouer(g, j, c)
+    display(g)
+    print ("Le tableau est complet !")
 
+#coup du joueur
 def jouer(g,j,c):
     """joue le coup à partir du joueur, de la grille et de la colonne"""
-
     if coup_possible(g,c):
         for i in range(len(g[c])-1,-1, -1):
             if g[c][i] == 0:
@@ -69,4 +66,5 @@ def jouer(g,j,c):
 print(coup_possible(g, 0))
 
 main()
+
 
