@@ -1,7 +1,7 @@
+from random import randint
 
 
-
-#initialize
+#initialise
 
 def init(l, h):
     """ prends la longueur et hauteur du tableau
@@ -31,10 +31,10 @@ def display(g):
 
 def coup_possible(g, c):
     """détermine si la grille g a de la place sur la colonne c"""
-    if g[c][0] == 0:
-        return True
-    else:
+    if len(g)-1 < c or g[c][0] != 0:
         return False
+    return True
+
 
 
 #verif
@@ -79,6 +79,15 @@ def check(g,j,l,c):
     if diag (g,j,l,c):
         print ("Le joueur", int(j)+1, "a gagné par diagonal !")
 
+
+def coup_aléatoire (g, j):
+    c = randint (0, len(g)-1)
+    while not coup_possible (g, c):
+        c = randint (0, len(g))
+    jouer (g, j, c)
+
+
+
 #Vérifie si complet
 def fin (g):
     for i in range (len(g)):
@@ -86,16 +95,26 @@ def fin (g):
             return True
     return False
 
+
 # main script
 def main():
     """fait tourner le jeu"""
+    a = randint (0,1)
     j = True
+    if a == 0:
+        j = not j
     while fin(g):
+        if j:
+            coup_aléatoire (g, j)
+            j =  not j
+            if not fin(g):
+                break
         print("_____________________________")
         display(g)
         c = int(input("colonne?"))
-        j =  not j
         jouer(g, j, c)
+        j =  not j
+    print("_____________________________")
     display(g)
     print ("Le tableau est complet !")
 
