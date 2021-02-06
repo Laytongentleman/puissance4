@@ -15,14 +15,21 @@ g = init(7,6)
 
 
 
-# Intermediate Functions
+# Fonctions qui sont appelées en jeu
 
 def display(g):
-    """fonction d'affichage qui affiche dans le bon sens le tableau en plus de convertir les nb en symboles"""
+    """fonction d'affichage qui affiche dans le bon sens le tableau
+        en plus de convertir les nombres en symboles:
+        1 -> O, 2 -> X  et 0 -> " "  """
+    # on crée une copie qui va être affichée 
     cg = init(7,6)
+    
+    # on remplit la copie à l'aide de g
     for i in range(len(g)):
         for j in range(len(g[i])):
             cg[i][j] = "O" if g[i][j] == 1 else "X" if g[i][j] == 2  else " "
+    
+    # on affiche
     print(" _______________")
     for i in range(len(g[0])):
         print("", end=" |")
@@ -32,12 +39,20 @@ def display(g):
 
 
 def coup_possible(g, c):
-    """détermine si la grille g a de la place sur la colonne c"""
-    return True if g[c][0] == 0 else False
+    """détermine si l'on peut jouer dans la colonne:
+        - si la colonne demandée existe dans g
+        - si la colonne n'est pas totalement remplie """
+    if  c < len(g) and c >= 0:
+        if g[c][0] == 0:
+            return True
+    else:
+        return False
 
 
-#verif
+#------------ Fonctions de vérification ------------------------
+
 def vertical (g,j,l,c):
+    """ vérifie la colonne où le coup est joué """
     point=0
     for i in range (6):
         if g[c][i]== 1 and j:
@@ -52,6 +67,7 @@ def vertical (g,j,l,c):
 
 
 def horiz (g, j, l, c):
+    """ vérifie la ligne où le coup est joué """
     point=0
     for i in range (7):
         if g[i][l]==1 and j:
@@ -64,6 +80,7 @@ def horiz (g, j, l, c):
             return True
 
 def diagd (g, j, l, c):
+    """ vérifie la diagonale haut gauche vers bas droite """ 
     point=0
     t = max(l,c) - min(l,c)
     coord = [0,0] # 0 c, 1 ;l
@@ -86,6 +103,7 @@ def diagd (g, j, l, c):
             return False
 
 def diagm (g, j, l, c):
+    """ vérifie la diagonale bas gauche vers haut droit """ 
     point=0
     coord = [c,l]
     while coord[0] >= 0 and coord[1] < 5:
@@ -108,6 +126,7 @@ def diagm (g, j, l, c):
 
 
 def check(g,j,l,c):
+    """ fonction qui exécute toutes les vérifications"""
     if vertical(g,j,l,c):
         print("Le joueur", int(j)+1, "a gagné par vertical !")
     if horiz(g,j,l,c):
@@ -123,13 +142,14 @@ def check(g,j,l,c):
 
 
 def coup_aléatoire (g, j):
+    """fonction qui joue un coup aléatoire pour le joueur entré en argument """
     c = randint (0, len(g)-1)
     while not coup_possible (g, c):
         c = randint (0, len(g))
     if jouer(g, j, c):
         return True
 
-def ia(g,j):
+"""def ia(g,j):
     if vertical(g,j,l,c):
         print("Le joueur", int(j)+1, "a gagné par vertical !")
     if horiz(g,j,l,c):
@@ -139,55 +159,71 @@ def ia(g,j):
     if diagm(g,j,l,c):
         print ("Le joueur", int(j)+1, "a gagné par diagonal Montante!")
     if diagm(g,j,l,c) or  diagd(g,j,l,c) or vertical(g,j,l,c) or horiz(g,j,l,c):    
-    pass
+    pass"""
 
 
 
+# fonctions principales pour faire tourner le jeu
 
 
-#Vérifie si complet
 def fin (g):
+    """détermine si la grille est pleine"""
     for i in range (len(g)):
         if coup_possible(g, i):
-            return True
-    return False
+            return False
+    return True
 
 
 def select():
+    """permet de choisir le mode de jeu"""
     mode = input("alea, 2j")
     return mode
 
 # main script
 def main():
+    """Fonction qui tourne le jeu"""
+    #choix arbitraire du joueur modifiable
     j = True
     mode = select()
+
     if mode == "alea":
         """fait tourner le jeu contre un bot aléatoire"""
+        # choix aléatoire du 1er joueur
         a = randint (0,1)
         if a == 0:
             j = not j
-        while fin(g):
+        
+        while not fin(g):
             if j:
                 if coup_aléatoire (g, j):
                     print("Perdu")
                     return True
                 j =  not j
-                if not fin(g):
+                if fin(g):
                     break
             display(g)
+
             c = int(input("colonne?"))
             if jouer(g, j, c):
                 return True
             j =  not j
-    if mode == "2j":
+    
+
+    elif mode == "2j":
         """fait tourner le jeu en local à 2 joueurs"""
-        while fin(g):
+        while not fin(g):
+
             display(g)
             c = int(input("colonne?"))
             j =  not j
             if jouer(g, j, c):
                 return True
+    else:
+        main()
+
     display(g)
+
+    # En cas d'égalité
     print ("Le tableau est complet !")
 
 
@@ -196,6 +232,8 @@ def jouer(g,j,c):
     """joue le coup à partir du joueur, de la grille et de la colonne"""
 
     if coup_possible(g,c):
+
+        # si le coup est possible prendre la 1er case vide en partant du bas
         for i in range(len(g[c])-1,-1, -1):
             if g[c][i] == 0:
                 g[c][i] = 1 if j else 2
@@ -203,8 +241,16 @@ def jouer(g,j,c):
                     return True
                 break
     else:
+        # fait rejouer le joueur si celui ci a demandé un coup impossible
         jouer(g,j, int(input("recommence")))
 
+
+
+
+assert coup_possible(g, len(g)) == False , "Erreur d'index trop grand"
+assert coup_possible(g, -1) == False , "Erreur d'index trop petit"
+assert fin([[1,1],[1,1]]) == True , "Erreur de fin"
+assert fin([[1,0],[0,1]]) == False , "Erreur de fin"
 
 print(coup_possible(g, 0))
 
