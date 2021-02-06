@@ -23,17 +23,17 @@ def display(g):
     for i in range(len(g)):
         for j in range(len(g[i])):
             cg[i][j] = "O" if g[i][j] == 1 else "X" if g[i][j] == 2  else " "
+    print(" _______________")
     for i in range(len(g[0])):
+        print("", end=" |")
         for j in range(len(g)):
-            print(cg[j][i], end=" | ")
+            print(cg[j][i], end="|")
         print()
 
 
 def coup_possible(g, c):
     """détermine si la grille g a de la place sur la colonne c"""
-    if len(g)-1 < c or g[c][0] != 0:
-        return False
-    return True
+    return True if g[c][0] == 0 else False
 
 
 #verif
@@ -117,6 +117,7 @@ def check(g,j,l,c):
     if diagm(g,j,l,c):
         print ("Le joueur", int(j)+1, "a gagné par diagonal Montante!")
     if diagm(g,j,l,c) or  diagd(g,j,l,c) or vertical(g,j,l,c) or horiz(g,j,l,c):
+        display(g)
         return True
 
 
@@ -127,6 +128,20 @@ def coup_aléatoire (g, j):
         c = randint (0, len(g))
     if jouer(g, j, c):
         return True
+
+def ia(g,j):
+    if vertical(g,j,l,c):
+        print("Le joueur", int(j)+1, "a gagné par vertical !")
+    if horiz(g,j,l,c):
+        print("Le joueur", int(j)+1, "a gagné par horizontal !")
+    if diagd(g,j,l,c):
+        print ("Le joueur", int(j)+1, "a gagné par diagonal Descendante!")
+    if diagm(g,j,l,c):
+        print ("Le joueur", int(j)+1, "a gagné par diagonal Montante!")
+    if diagm(g,j,l,c) or  diagd(g,j,l,c) or vertical(g,j,l,c) or horiz(g,j,l,c):    
+    pass
+
+
 
 
 
@@ -145,7 +160,8 @@ def select():
 # main script
 def main():
     j = True
-    if select() == "alea":
+    mode = select()
+    if mode == "alea":
         """fait tourner le jeu contre un bot aléatoire"""
         a = randint (0,1)
         if a == 0:
@@ -158,22 +174,19 @@ def main():
                 j =  not j
                 if not fin(g):
                     break
-            print("_____________________________")
             display(g)
             c = int(input("colonne?"))
             if jouer(g, j, c):
                 return True
             j =  not j
-    if select() == "2j":
+    if mode == "2j":
         """fait tourner le jeu en local à 2 joueurs"""
         while fin(g):
-            print("_____________________________")
             display(g)
             c = int(input("colonne?"))
             j =  not j
             if jouer(g, j, c):
                 return True
-    print("_____________________________")
     display(g)
     print ("Le tableau est complet !")
 
