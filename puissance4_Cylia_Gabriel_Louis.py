@@ -21,14 +21,14 @@ def display(g):
     """fonction d'affichage qui affiche dans le bon sens le tableau
         en plus de convertir les nombres en symboles:
         1 -> O, 2 -> X  et 0 -> " "  """
-    # on crée une copie qui va être affichée 
+    # on crée une copie qui va être affichée
     cg = init(7,6)
-    
+
     # on remplit la copie à l'aide de g
     for i in range(len(g)):
         for j in range(len(g[i])):
             cg[i][j] = "O" if g[i][j] == 1 else "X" if g[i][j] == 2  else " "
-    
+
     # on affiche
     print(" _______________")
     for i in range(len(g[0])):
@@ -80,7 +80,7 @@ def horiz (g, j, l, c):
             return True
 
 def diagd (g, j, l, c):
-    """ vérifie la diagonale haut gauche vers bas droite """ 
+    """ vérifie la diagonale haut gauche vers bas droite """
     point=0
     t = max(l,c) - min(l,c)
     coord = [0,0] # 0 c, 1 ;l
@@ -103,7 +103,7 @@ def diagd (g, j, l, c):
             return False
 
 def diagm (g, j, l, c):
-    """ vérifie la diagonale bas gauche vers haut droit """ 
+    """ vérifie la diagonale bas gauche vers haut droit """
     point=0
     coord = [c,l]
     while coord[0] >= 0 and coord[1] < 5:
@@ -127,16 +127,18 @@ def diagm (g, j, l, c):
 
 def check(g,j,l,c):
     """ fonction qui exécute toutes les vérifications"""
+    gagner = ""
     if vertical(g,j,l,c):
-        print("Le joueur", int(j)+1, "a gagné par vertical !")
+        gagner = "vertical"
     if horiz(g,j,l,c):
-        print("Le joueur", int(j)+1, "a gagné par horizontal !")
+        gagner = "horizontal"
     if diagd(g,j,l,c):
-        print ("Le joueur", int(j)+1, "a gagné par diagonal Descendante!")
+        gagner = "diagonale Descendante"
     if diagm(g,j,l,c):
-        print ("Le joueur", int(j)+1, "a gagné par diagonal Montante!")
-    if diagm(g,j,l,c) or  diagd(g,j,l,c) or vertical(g,j,l,c) or horiz(g,j,l,c):
+        gagner = "diagonale Montante"
+    if gagner != "":
         display(g)
+        print ("Le joueur", int(j)+1, "a gagné par", gagner, "!")
         return True
 
 
@@ -148,19 +150,6 @@ def coup_aléatoire (g, j):
         c = randint (0, len(g))
     if jouer(g, j, c):
         return True
-
-"""def ia(g,j):
-    if vertical(g,j,l,c):
-        print("Le joueur", int(j)+1, "a gagné par vertical !")
-    if horiz(g,j,l,c):
-        print("Le joueur", int(j)+1, "a gagné par horizontal !")
-    if diagd(g,j,l,c):
-        print ("Le joueur", int(j)+1, "a gagné par diagonal Descendante!")
-    if diagm(g,j,l,c):
-        print ("Le joueur", int(j)+1, "a gagné par diagonal Montante!")
-    if diagm(g,j,l,c) or  diagd(g,j,l,c) or vertical(g,j,l,c) or horiz(g,j,l,c):    
-    pass"""
-
 
 
 # fonctions principales pour faire tourner le jeu
@@ -176,55 +165,67 @@ def fin (g):
 
 def select():
     """permet de choisir le mode de jeu"""
-    mode = input("alea, 2j")
-    return mode
-
-# main script
-def main():
-    """Fonction qui tourne le jeu"""
-    #choix arbitraire du joueur modifiable
-    j = True
-    mode = select()
+    mode = 0
+    while mode != "alea" and mode != "2j":
+        mode = input("alea, 2j ")
 
     if mode == "alea":
-        """fait tourner le jeu contre un bot aléatoire"""
-        # choix aléatoire du 1er joueur
-        a = randint (0,1)
-        if a == 0:
-            j = not j
-        
-        while not fin(g):
-            if j:
-                if coup_aléatoire (g, j):
-                    print("Perdu")
-                    return True
-                j =  not j
-                if fin(g):
-                    break
-            display(g)
-
-            c = int(input("colonne?"))
-            if jouer(g, j, c):
-                return True
-            j =  not j
-    
-
-    elif mode == "2j":
-        """fait tourner le jeu en local à 2 joueurs"""
-        while not fin(g):
-
-            display(g)
-            c = int(input("colonne?"))
-            j =  not j
-            if jouer(g, j, c):
-                return True
-    else:
-        main()
-
-    display(g)
+        main_alea()
+    if mode == "2j":
+        main_2j()
 
     # En cas d'égalité
-    print ("Le tableau est complet !")
+    if fin(g):
+        display(g)
+        print ("Le tableau est complet !")
+
+"""
+    recommencer = input("Recommencer? oui, non ")
+    if recommencer == "non":
+        print ("Merci d'avoir jouer")
+    elif recommencer == "oui":
+        g = init (7, 6)
+        select()"""
+
+
+
+# main script contre un bot
+def main_alea():
+    """fait tourner le jeu contre un bot aléatoire"""
+    #choix arbitraire du joueur modifiable
+    j = True
+    # choix aléatoire du 1er joueur
+    a = randint (0,1)
+    if a == 0:
+        j = not j
+
+    while not fin(g):
+        if j:
+            if coup_aléatoire (g, j):
+                print("Perdu")
+                return False
+            j =  not j
+            if fin(g):
+                return False
+        display(g)
+
+        c = int(input("colonne?"))
+        if jouer(g, j, c):
+            return True
+        j =  not j
+    return False
+
+# main script pour 2 joueurs
+def main_2j():
+    """fait tourner le jeu en local à 2 joueurs"""
+    #choix arbitraire du joueur modifiable
+    j = True
+    while not fin(g):
+        display(g)
+        c = int(input("colonne?"))
+        j =  not j
+        if jouer(g, j, c):
+            return True
 
 
 
@@ -241,7 +242,7 @@ def jouer(g,j,c):
                     return True
                 break
     else:
-        # fait rejouer le joueur si celui ci a demandé un coup impossible
+        # fait rejouer le joueur si celui-ci a demandé un coup impossible
         jouer(g,j, int(input("recommence")))
 
 
@@ -254,5 +255,5 @@ assert fin([[1,0],[0,1]]) == False , "Erreur de fin"
 
 print(coup_possible(g, 0))
 
-main()
+select()
 
