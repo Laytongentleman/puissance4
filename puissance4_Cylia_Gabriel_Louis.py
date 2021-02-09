@@ -15,7 +15,7 @@ g = init(7,6)
 
 
 
-# Fonctions qui sont appelées en jeu
+# ------------- Fonctions qui sont appelées en jeu -------------------
 
 def display(g):
     """fonction d'affichage qui affiche dans le bon sens le tableau
@@ -83,7 +83,7 @@ def diagd (g, j, l, c):
     """ vérifie la diagonale haut gauche vers bas droite """
     point=0
     t = max(l,c) - min(l,c)
-    coord = [0,0] # 0 c, 1 ;l
+    coord = [0,0] # 0 c, 1 l
     if l > c :
         coord [1] = t
     else:
@@ -127,7 +127,7 @@ def diagm (g, j, l, c):
 
 def check(g,j,l,c):
     """ fonction qui exécute toutes les vérifications"""
-    gagner = ""
+    gagner = "" # Variable qui permet d'afficher quelle vérification est vérifiée
     if vertical(g,j,l,c):
         gagner = "vertical"
     if horiz(g,j,l,c):
@@ -152,7 +152,10 @@ def coup_aléatoire (g, j):
         return True
 
 
-# fonctions principales pour faire tourner le jeu
+
+
+
+# ---------------- fonctions principales pour faire tourner le jeu ---------------------
 
 
 def fin (g):
@@ -167,7 +170,7 @@ def select(g):
     """permet de choisir le mode de jeu"""
     mode = 0
     while mode != "alea" and mode != "2j":
-        mode = input("alea, 2j ")
+        mode = input("Mode ? alea, 2j : ")
 
     if mode == "alea":
         g = main_alea(g)
@@ -181,7 +184,7 @@ def select(g):
 
     recommencer = 0
     while recommencer != "oui" and recommencer != "non":
-        recommencer = input("Recommencer? oui, non ")
+        recommencer = input("Recommencer? oui, non : ")
     if recommencer == "non":
         print ("Merci d'avoir jouer")
     elif recommencer == "oui":
@@ -210,7 +213,7 @@ def main_alea(g):
                 return g
         display(g)
 
-        c = int(input("colonne?"))
+        c = choix_colonne(g)
         if jouer(g, j, c):
             return g
         j =  not j
@@ -223,7 +226,7 @@ def main_2j(g):
     j = True
     while not fin(g):
         display(g)
-        c = int(input("colonne?"))
+        c = choix_colonne(g)
         j =  not j
         if jouer(g, j, c):
             return g
@@ -244,7 +247,16 @@ def jouer(g,j,c):
                 break
     else:
         # fait rejouer le joueur si celui-ci a demandé un coup impossible
-        jouer(g,j, int(input("recommence")))
+        print ("La colonne est pleine, recommence. ")
+        jouer(g,j, choix_colonne(g))
+
+def choix_colonne (g):
+    c = input("colonne? ")
+    for i in range (len(g)):
+        if c == str(i):
+            c = int (c)
+            return c
+    choix_colonne(g)
 
 
 
