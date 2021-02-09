@@ -163,34 +163,35 @@ def fin (g):
     return True
 
 
-def select():
+def select(g):
     """permet de choisir le mode de jeu"""
     mode = 0
     while mode != "alea" and mode != "2j":
         mode = input("alea, 2j ")
 
     if mode == "alea":
-        main_alea()
+        g = main_alea(g)
     if mode == "2j":
-        main_2j()
+        g = main_2j(g)
 
     # En cas d'égalité
     if fin(g):
         display(g)
         print ("Le tableau est complet !")
 
-"""
-    recommencer = input("Recommencer? oui, non ")
+    recommencer = 0
+    while recommencer != "oui" and recommencer != "non":
+        recommencer = input("Recommencer? oui, non ")
     if recommencer == "non":
         print ("Merci d'avoir jouer")
     elif recommencer == "oui":
-        g = init (7, 6)
-        select()"""
+        gn = init (7, 6)
+        select(gn)
 
 
 
 # main script contre un bot
-def main_alea():
+def main_alea(g):
     """fait tourner le jeu contre un bot aléatoire"""
     #choix arbitraire du joueur modifiable
     j = True
@@ -203,20 +204,20 @@ def main_alea():
         if j:
             if coup_aléatoire (g, j):
                 print("Perdu")
-                return False
+                return g
             j =  not j
             if fin(g):
-                return False
+                return g
         display(g)
 
         c = int(input("colonne?"))
         if jouer(g, j, c):
-            return True
+            return g
         j =  not j
-    return False
+    return g
 
 # main script pour 2 joueurs
-def main_2j():
+def main_2j(g):
     """fait tourner le jeu en local à 2 joueurs"""
     #choix arbitraire du joueur modifiable
     j = True
@@ -225,8 +226,8 @@ def main_2j():
         c = int(input("colonne?"))
         j =  not j
         if jouer(g, j, c):
-            return True
-
+            return g
+    return g
 
 
 def jouer(g,j,c):
@@ -255,5 +256,5 @@ assert fin([[1,0],[0,1]]) == False , "Erreur de fin"
 
 print(coup_possible(g, 0))
 
-select()
+select(g)
 
