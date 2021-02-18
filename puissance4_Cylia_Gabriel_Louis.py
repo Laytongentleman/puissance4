@@ -10,12 +10,13 @@ def init(l, h):
     g = [ [0] * h for i in range(l)]
     return g
 
+
 def display(g):
     """fonction d'affichage qui affiche dans le bon sens le tableau
         en plus de convertir les nombres en symboles:
         1 -> O, 2 -> X  et 0 -> " "  """
     # on crée une copie qui va être affichée
-    cg = init(7,6)
+    cg = init(len(g), len(g[0]))
 
     # on remplit la copie à l'aide de g
     for i in range(len(g)):
@@ -31,16 +32,10 @@ def display(g):
         print()
 
 
+
 #------------ Fonctions de vérification de fin de jeu ------------------------
 
-def fin (g):
-    """détermine si la grille est pleine"""
-    for i in range (len(g)):
-        if coup_possible(g, i):
-            return False
-    return True
-
-def vertical (g,j,l,c):
+def vertical (g, j, l, c):
     """ vérifie la colonne où le coup est joué """
     point = 0
     for i in range (6):
@@ -111,22 +106,45 @@ def diagm (g, j, l, c):
         if coord[0] > 6 or coord[1]<0:
             return False
 
-def check (g,j,l,c):
+def check (g, j, l, c, mode):
     """ fonction qui exécute toutes les vérifications"""
     gagner = "" # Variable qui permet d'afficher quelle vérification est vérifiée
+
     if vertical(g,j,l,c):
         gagner = "vertical"
+
     if horiz(g,j,l,c):
         gagner = "horizontal"
+
     if diagd(g,j,l,c):
         gagner = "diagonale Descendante"
+
     if diagm(g,j,l,c):
         gagner = "diagonale Montante"
+
     if gagner != "":
         display(g)
-        print ("Le joueur", int(j)+1, "a gagné par", gagner, "!")
+        if mode == "2j":
+            print ("Le joueur", int(j)+1, "a gagné par", gagner, "!")
+        if mode == "alea":
+            if j:
+                vic = "gagné"
+            else:
+                vic = "perdu"
+            print ("Le bot a", vic, "par", gagner, "!")
         print ()
         return True
+
+
+def fin (g):
+    """détermine si la grille est pleine"""
+    for i in range (len(g)):
+        if coup_possible(g, i):
+            return False
+    display(g)
+    print ("La grille est complète !")
+    return True
+
 
 
 # -------------- Fonctions qui gèrent le coup du joueur ou du bot -----------------
@@ -140,71 +158,76 @@ def coup_possible (g, c):
             return True
     return False
 
+
 def choix_colonne (g):
     """demande au joueur la colone dans la quelle il veut jouer quand qu'il n'a pas donnée un nombre possible"""
+    # variable qui permet de ne pas avoir une erreur si le joueur ne donnent pas un chiffre
+    rep = None
     c = None
-    j = None
 
-    while j == None and str(j) != c:
-        c = input("colonne? ")
+    while c == None and str(c) != rep:
+        rep = input("colonne? ")
+
         for i in range (len(g)):
-            if c == str(i):
-                j = i
+            if rep == str(i):
+                c = i
 
-    while not coup_possible (g, j):
+    while not coup_possible (g, c):
         # fait rejouer le joueur si celui-ci a demandé une colonne pleine
         print ("La colonne est pleine. ")
-        j = choix_colonne(g)
-    return j
+        c = choix_colonne(g)
+    return c
+
 
 def coup_aléatoire (g, j):
     """fonction qui joue un coup aléatoire pour le joueur entré en argument """
 
+    # donne une colonne au hasard
     c = randint (0, len(g)-1)
     while not coup_possible (g, c):
-        c = randint (0, len(g))
+        c = randint (0, len(g)-1)
 
-    if jouer(g, j, c):
-        return True
+    # joue le coup du bot
+    return jouer(g, j, c, "alea")
 
-def jouer (g,j,c):
+
+def jouer (g,j,c, mode):
     """joue le coup à partir du joueur, de la grille et de la colonne"""
 
     for i in range(len(g[c])-1,-1, -1):
         if g[c][i] == 0:
             g[c][i] = 1 if j else 2
 
-            if check(g,j,i,c):
-                return True
-            return False
+            # retourne si le joueur a gagné ou non
+            return check (g, j, i, c, mode)
 
 
 # ---------------- fonctions principales pour faire tourner le jeu ---------------------
 
-# Pour démarer une partie ou quitter le je
+# Pour démarer une partie ou quitter le jeu
 def jeu ():
     """ Gère le début et la fin du jeu"""
-
     # Permet le comtage des points
-    point = [0,0,0,0,0,0]
+    point = [0, 0,0, 0,0, 0]
 
     recommencer = input("Voulez-vous jouer à puissance 4 ? oui, non : ")
+    # permet de rejouer ou de ne pas jouer du tout
     while recommencer != "non":
 
         if recommencer == "oui":
             # initialise une grille pour le jeu
             g = init (7, 6)
-            select(g, point)
+            select (g, point)
+        recommencer = input("Recommencer ? oui, non : ")
 
-        recommencer = input("Recommencer? oui, non : ")
-
-    # Affiche le nombre de victoire à condition qu'il y a eu au moins une partie
+    # Affiche le nombre de victoire à condition qu'il y ait eu au moins une partie
     if point[-1] != 0:
         victoire (point)
 
         # Politesse de fin
         print ("Merci d'avoir jouer. ")
     print ("A une prochaine fois. ")
+
 
 def victoire (point):
     """Affiche le nombre de victoire par joueur selon le mode de jeu, ainsi que le nombre de partie"""
@@ -224,6 +247,7 @@ def victoire (point):
     print ("Le nombre totale de partie est de :", point[-1])
     print ()
 
+
 # Permet d'avoir plusieurs modes de jeu
 def select (g, point):
     """ choix du mode de jeu """
@@ -240,26 +264,23 @@ def select (g, point):
     if mode == "alea":
         point[main_alea(g, j)] += 1
     if mode == "2j":
-        vic_2j = [point[1], point[2]]
         point[main_2j(g, j)] += 1
 
     # compte le nombre de partie
     point[-1] += 1
 
-    # En cas d'égalité
-    if fin(g):
-        display(g)
-        print ("Le tableau est complet !")
 
 def choix_debut (point, mode):
     """ renvoie le joueur qui commence la partie """
+    # booléen désignant les joueurs
     j = True
+
     choix = ""
     while choix != "oui" and choix != "non":
         choix = input ("Voulez-vous choisir le premier joueur ? oui, non : ")
 
     if choix == "non":
-    # choix aléatoire
+        # choix aléatoire
         a = randint (0,1)
         if a == 0:
             j = not j
@@ -305,28 +326,31 @@ def choix_debut (point, mode):
 
     return j
 
+
 # main script contre un bot
 def main_alea (g, j):
     """fait tourner le jeu contre un bot aléatoire"""
 
     while not fin(g):
 
+        # permet de choisir si le bot commence ou non
         if j:
             if coup_aléatoire (g, j):
                 print("Perdu")
                 return 4
 
-            j =  not j
             if fin(g):
                 return 0
-
+            j = not j
         display(g)
+
         c = choix_colonne(g)
-        if jouer(g, j, c):
+        if jouer(g, j, c, "alea"):
             return 3
 
         j =  not j
     return 0
+
 
 # main script pour 2 joueurs
 def main_2j (g, j):
@@ -337,7 +361,7 @@ def main_2j (g, j):
         c = choix_colonne(g)
         j =  not j
 
-        if jouer(g, j, c):
+        if jouer(g, j, c, "2j"):
             return int(j)+1
 
     return 0
