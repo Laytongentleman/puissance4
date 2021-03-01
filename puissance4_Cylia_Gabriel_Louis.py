@@ -48,6 +48,7 @@ def vertical (g, j, l, c):
         if point==4:
             return True
 
+
 def horiz (g, j, l, c):
     """ vérifie la ligne où le coup est joué """
     point=0
@@ -191,6 +192,197 @@ def coup_aléatoire (g, j):
     return jouer(g, j, c, "alea")
 
 
+def vertical_ia (g, j, l, c, n):
+    """ vérifie la colonne où le coup est joué """
+    point = 0
+    for i in range (6):
+        if g[c][i]== 1 and j:
+            point+=1
+        elif g[c][i]==2 and not j:
+            point+=1
+        else:
+            point=0
+        if point==n:
+            return [True,i]
+    return [False]
+def horiz_ia (g, j, l, c, n):
+    """ vérifie la ligne où le coup est joué """
+    point=0
+    for i in range (7):
+        if g[i][l]==1 and j:
+            point+=1
+        elif g[i][l]==2 and not j:
+            point+=1
+        else:
+            point=0
+        if point==n:
+            return [True,i]
+    else:
+        return [False]
+
+def diagd_ia (g, j, l, c, n):
+    """ vérifie la diagonale haut gauche vers bas droite """
+    point=0
+    t = max(l,c) - min(l,c)
+    coord = [0,0] # 0 c, 1 l
+    if l > c :
+        coord [1] = t
+    else:
+        coord [0] = t
+    while True:
+        if g[coord [0]][coord [1]]==1 and j:
+            point+=1
+        elif g[coord [0]][coord [1]]==2 and not j:
+            point+=1
+        else:
+            point=0
+        if point==n:
+            print(coord)
+            return [True,coord]
+        coord[0] += 1
+        coord[1] += 1
+        if coord[0] > 6 or coord[1] > 5:
+            return [False]
+
+def diagm_ia (g, j, l, c, n):
+    """ vérifie la diagonale bas gauche vers haut droit """
+    point=0
+    coord = [c,l]
+    while coord[0] >= 0 and coord[1] < 5:
+        coord[0] -= 1
+        coord[1] += 1
+    while True:
+        if g[coord [0]][coord [1]]==1 and j:
+            point+=1
+        elif g[coord [0]][coord [1]]==2 and not j:
+            point+=1
+        else:
+            point=0
+
+        if point==n:
+            return [True,coord]
+        coord[0] += 1
+        coord[1] -= 1
+        if coord[0] > 6 or coord[1]<0:
+            return [False]
+
+def anticipation(g, c, y, liste):
+    if coup_possible(g,c):
+        for i in range(len(g[c])-1, -1, -1):
+            if i == y and g[c][y] == 0:
+                print(i, c, g[c][y])
+                return True
+            if i == y and g[c][y] != 0:
+                return False
+            if g[c][i] == 0:
+                liste[c] = None
+                return False
+                
+    return False
+
+
+liste =  [0,1,2,3,2,1,0]
+def ia(g, j):
+    """fonction qui joue un coup aléatoire pour le joueur entré en argument """
+    for n in [3,2]:
+        for p in [True, False]:
+            # vérifie si y a une verti gagnante
+            for c in range(0, len(g)):
+                rep = vertical_ia(g, p, 0, c,  n)
+                if rep[0]:
+                    print(rep, p)
+                    ant = anticipation(g, c, rep[1]-3, liste)
+                    if ant:
+                        return jouer(g, j, c, "alea")
+            
+            # Vérifie si y a une horizontale gagnante:
+            for l in range(0, len(g[0])):
+                rep = horiz_ia(g,p,l,0, n)
+                if rep[0]:
+                    if coup_possible(g,rep[1]+1):
+                        c = rep[1]+1
+                        ant = anticipation(g, c, l, liste)
+                        if ant:
+                            return jouer(g, j, c, "alea")
+
+                            
+                    if coup_possible(g,rep[1]-3) :
+                        c = rep[1]-3
+                        if anticipation(g, c, l, liste):
+                            return jouer(g, j, c, "alea")
+            # diago descendante
+            for c in range(0,len(g)):
+                rep = diagd_ia (g, p, 0, c, n)
+                if rep[0]:
+                    print("diagd")
+                    if coup_possible(g, rep[1][0]+1):
+                        c = rep[1][0]+1
+                        ant = anticipation(g, c, rep[1][1]+1, liste)
+                        if ant:
+                            return jouer(g, j, c, "alea")
+                    if coup_possible(g, rep[1][0]-3):
+                        c = rep[1][0]-3
+                        ant = anticipation(g, c, rep[1][1]-3, liste)
+                        if ant:
+                            return jouer(g, j, c, "alea")
+            for l in range(0,len(g[c])):
+                rep = diagd_ia (g, p, l, 0, n)
+                if rep[0]:
+                    print("diagd")
+                    if coup_possible(g, rep[1][0]+1):
+                        c = rep[1][0]+1
+                        ant = anticipation(g, c, rep[1][1]+1, liste)
+                        if ant:
+                            return jouer(g, j, c, "alea")
+                    if coup_possible(g, rep[1][0]-3):
+                        c = rep[1][0]-3
+                        ant = anticipation(g, c, rep[1][1]-3, liste)
+                        if ant:
+                            return jouer(g, j, c, "alea")
+
+
+
+            #Vérifie si y a une diagm
+            for c in range(0,len(g)):
+                rep = diagm_ia (g, p, len(g[c])-1, c, n)
+                if rep[0]:
+                    print("diagd")
+                    if coup_possible(g, rep[1][0]+1):
+                        c = rep[1][0]+1
+                        ant = anticipation(g, c, rep[1][1]-1, liste)
+                        if ant:
+
+                            return jouer(g, j, c, "alea")
+                    if coup_possible(g, rep[1][0]-3):
+                        c = rep[1][0]-3
+                        ant = anticipation(g, c, rep[1][1]+3, liste)
+                        if ant:
+                            return jouer(g, j, c, "alea")
+
+            for l in range(0,len(g[c])):
+                rep = diagm_ia (g, p, l, 0, n)
+                if rep[0]:
+                    print("diagd")
+                    if coup_possible(g, rep[1][0]+1):
+                        c = rep[1][0]+1
+                        ant = anticipation(g, c, rep[1][1]-1, liste)
+                        if ant:
+                            return jouer(g, j, c, "alea")
+                    if coup_possible(g, rep[1][0]-3):
+                        c = rep[1][0]-3
+                        ant = anticipation(g, c, rep[1][1]-3, liste)
+                        if ant:
+                            return jouer(g, j, c, "alea")
+
+
+
+    c = randint (0, len(g)-1)
+    while not coup_possible (g, c):
+        c = randint (0, len(g)-1)
+    # joue le coup du bot
+    return jouer(g, j, c, "alea")
+
+
 def jouer (g,j,c, mode):
     """joue le coup à partir du joueur, de la grille et de la colonne"""
 
@@ -206,27 +398,8 @@ def jouer (g,j,c, mode):
 
 # Pour démarer une partie ou quitter le jeu
 def jeu ():
-    """ Gère le début et la fin du jeu"""
-    # Permet le comtage des points
-    point = [0, 0,0, 0,0, 0]
-
-    recommencer = input("Voulez-vous jouer à puissance 4 ? oui, non : ")
-    # permet de rejouer ou de ne pas jouer du tout
-    while recommencer != "non":
-
-        if recommencer == "oui":
-            # initialise une grille pour le jeu
-            g = init (7, 6)
-            select (g, point)
-        recommencer = input("Recommencer ? oui, non : ")
-
-    # Affiche le nombre de victoire à condition qu'il y ait eu au moins une partie
-    if point[-1] != 0:
-        victoire (point)
-
-        # Politesse de fin
-        print ("Merci d'avoir jouer. ")
-    print ("A une prochaine fois. ")
+    g = init (7, 6)
+    select(g)
 
 
 def victoire (point):
@@ -249,82 +422,24 @@ def victoire (point):
 
 
 # Permet d'avoir plusieurs modes de jeu
-def select (g, point):
+def select (g):
     """ choix du mode de jeu """
 
     print ()
     mode = 0
-    while mode != "alea" and mode != "2j":
-        mode = input("Mode ? alea, 2j : ")
+    while mode != "alea" and mode != "2j" and mode != "ia":
+        mode = input("Mode ? alea, 2j, ia : ")
     print ()
 
     # permet de choisir qui commence la partie
-    j = choix_debut (point, mode)
-
-    if mode == "alea":
-        point[main_alea(g, j)] += 1
-    if mode == "2j":
-        point[main_2j(g, j)] += 1
-
-    # compte le nombre de partie
-    point[-1] += 1
-
-
-def choix_debut (point, mode):
-    """ renvoie le joueur qui commence la partie """
-    # booléen désignant les joueurs
     j = True
+    if mode == "alea":
+        print("le gagnant est le joueur ", main_alea(g, j))
+    if mode == "2j":
+        print("le gagnant est le joueur ", main_2j(g, j))
+    if mode == "ia":
+       print("le gagnant est le joueur ",main_ia(g, j))
 
-    choix = ""
-    while choix != "oui" and choix != "non":
-        choix = input ("Voulez-vous choisir le premier joueur ? oui, non : ")
-
-    if choix == "non":
-        # choix aléatoire
-        a = randint (0,1)
-        if a == 0:
-            j = not j
-
-        if mode == "2j":
-            if j:
-                print ("C'est le joueur 1 (X) qui commence. ")
-            else :
-                print ("C'est le joueur 2 (O) qui commence. ")
-
-        else:
-            if j:
-                print ("Le bot joue en premier. ")
-            else :
-                print ("Le bot joue en deuxième. ")
-
-    # choix du joueur qui commence en fonction du mode
-    elif choix == "oui":
-        print ()
-        commencer = ""
-
-        if mode == "2j":
-            print ("Le joueur 1 (X) a gagné", point[1], "fois. ")
-            print ("Le joueur 2 (O) a gagné", point[2], "fois. ")
-            print ()
-
-            while commencer != "1" and commencer != "2":
-                commencer = input ("Qui commence? 1, 2 : ")
-
-            if commencer == "2":
-                j = not j
-
-        elif mode == "alea":
-            print ("Le bot a perdu", point[3], "fois. ")
-            print ("Le bot a gagné", point[4], "fois. ")
-            print ()
-
-            while commencer != "oui" and commencer != "non":
-                commencer = input (" Voulez-vous commencer ? oui, non : ")
-
-            if commencer == "oui":
-                j = not j
-
-    return j
 
 
 # main script contre un bot
@@ -366,7 +481,52 @@ def main_2j (g, j):
 
     return 0
 
+def main_alea (g, j):
+    """fait tourner le jeu contre un bot aléatoire"""
 
+    while not fin(g):
+
+        # permet de choisir si le bot commence ou non
+        if j:
+            if coup_aléatoire (g, j):
+                print("Perdu")
+                return 4
+
+            if fin(g):
+                return 0
+            j = not j
+        display(g)
+
+        c = choix_colonne(g)
+        if jouer(g, j, c, "alea"):
+            return 3
+
+        j =  not j
+    return 0
+
+
+def main_ia (g, j):
+    """fait tourner le jeu contre un bot intelligent"""
+
+    while not fin(g):
+
+        # permet de choisir si le bot commence ou non
+        if j:
+            if ia(g, j):
+                print("Perdu")
+                return 4
+
+            if fin(g):
+                return 0
+            j = not j
+        display(g)
+
+        c = choix_colonne(g)
+        if jouer(g, j, c, "ia"):
+            return 3
+
+        j =  not j
+    return 0
 
 jeu()
 
