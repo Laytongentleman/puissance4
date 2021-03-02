@@ -21,13 +21,13 @@ func anim():
 
 func start(count, c, i ):
 	self.position = Vector2(-500, -500)
-	if count % 2 == 0:
+	if count % 2 == 1:
 		self.texture = load("res://pionjaune.png")
 	else:
 		self.texture = load("res://pionrouge.png")
 	var tween = get_node("Tween")
 	tween.interpolate_property(self, "position",
-		get_parent().get_node("Player").position, Vector2(265 + 87 * c, 120 + 87*i), 1,
+		get_parent().get_node("Player").position, Vector2(265 + 87.5 * c, 120 + 87.5*i), 1,
 		Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
 

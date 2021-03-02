@@ -328,7 +328,6 @@ def ia(g, j):
             for l in range(0,len(g[c])):
                 rep = diagd_ia (g, p, l, 0, n)
                 if rep[0]:
-                    print("diagd")
                     if coup_possible(g, rep[1][0]+1):
                         c = rep[1][0]+1
                         ant = anticipation(g, c, rep[1][1]+1, liste)
@@ -346,7 +345,6 @@ def ia(g, j):
             for c in range(0,len(g)):
                 rep = diagm_ia (g, p, len(g[c])-1, c, n)
                 if rep[0]:
-                    print("diagd")
                     if coup_possible(g, rep[1][0]+1):
                         c = rep[1][0]+1
                         ant = anticipation(g, c, rep[1][1]-1, liste)
@@ -362,7 +360,6 @@ def ia(g, j):
             for l in range(0,len(g[c])):
                 rep = diagm_ia (g, p, l, 0, n)
                 if rep[0]:
-                    print("diagd")
                     if coup_possible(g, rep[1][0]+1):
                         c = rep[1][0]+1
                         ant = anticipation(g, c, rep[1][1]-1, liste)

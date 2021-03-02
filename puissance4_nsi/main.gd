@@ -23,7 +23,7 @@ func _ready():
 	count = 0
 signal change_player
 func _process(delta):
-	if Input.is_action_just_pressed("rclic"):
+	if Input.is_action_just_pressed("rclic") and get_tree().paused == false:
 		if get_global_mouse_position().y < 150:
 			if get_global_mouse_position().x > 220 and get_global_mouse_position().x < 290:
 				c = 0
@@ -160,15 +160,19 @@ func check (g, j, l, c, mode):
 
 	if gagner != "":
 		display(g)
+		$Popup.show()
 		if mode == "2j":
-			print ("Le joueur", int(j)+1, "a gagné par", gagner, "!")
+			$Popup/Label.text = ("Le joueur " + "jaune " if count % 2 == 1 else "rouge "+ "a gagné par "+gagner+"!")
+			print ("Le joueur", "jaune " if count % 2 == 1 else "rouge ", "a gagne par", gagner, "!")
 		if mode == "alea":
 			if j:
 				vic = "gagné"
 			else:
 				vic = "perdu"
+			$Popup/Label.text = ("Le joueur " + "jaune " if count % 2 == 1 else "rouge "+ "a gagné par "+gagner+"!")
 			print ("Le bot a", vic, "par", gagner, "!")
 		print ()
+		get_tree().paused = true
 		return true
 
 
